@@ -49,19 +49,32 @@ def _preprocess_data(data):
     # Load the dictionary as a Pandas DataFrame.
     feature_vector_df = pd.DataFrame.from_dict([feature_vector_dict])
 
-    # ---------------------------------------------------------------
-    # NOTE: You will need to swap the lines below for your own data
-    # preprocessing methods.
-    #
-    # The code below is for demonstration purposes only. You will not
-    # receive marks for submitting this code in an unchanged state.
-    # ---------------------------------------------------------------
+  
+    # Splitting time into different components
+    feature_vector_df['Hour_of_day'] = feature_vector_df['time'].astype('datetime64').dt.hour
+    feature_vector_df['Year'] = feature_vector_df['time'].astype('datetime64').dt.year
+    feature_vector_df['Hour_of_week'] = feature_vector_df['time'].astype('datetime64').dt.hour
+    feature_vector_df['Day_of_month'] = feature_vector_df['time'].astype('datetime64').dt.day
+    feature_vector_df['Day_of_week'] = feature_vector_df['time'].astype('datetime64').dt.day
 
-    # ----------- Replace this code with your own preprocessing steps --------
-    predict_vector = feature_vector_df[['Madrid_wind_speed','Bilbao_rain_1h','Valencia_wind_speed']]
-    # ------------------------------------------------------------------------
+    # Dropping the feature
+    feature_vector_df = feature_vector_df.drop('time',axis=1)
+    feature_vector_df = feature_vector_df.drop('Unnamed: 0',axis=1)
 
+    # Fill in null values with mode
+    feature_vector_df.Valencia_pressure.fillna(1014.148351, inplace=True)
+
+    # Encodeing the catagorical data
+    from sklearn.preprocessing import OrdinalEncoder
+    enc = OrdinalEncoder()
+    feature_vector_df.Valencia_wind_deg = enc.fit_transform(feature_vector_df[['Valencia_wind_deg']])
+    feature_vector_df.Seville_pressure = enc.fit_transform(feature_vector_df[['Seville_pressure']])
+
+  
+    predict_vector = feature_vector_df.copy()
+    
     return predict_vector
+
 
 def load_model(path_to_model:str):
     """Adapter function to load our pretrained model into memory.
