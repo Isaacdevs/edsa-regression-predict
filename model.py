@@ -72,6 +72,8 @@ def _preprocess_data(data):
 
   
     predict_vector = feature_vector_df.copy()
+
+    # predict_vector = feature_vector_df[['Madrid_wind_speed','Bilbao_rain_1h','Valencia_wind_speed']]
     
     return predict_vector
 
@@ -115,9 +117,13 @@ def make_prediction(data, model):
         A 1-D python list containing the model prediction.
 
     """
+    result_list = list() 
+
     # Data preprocessing.
     prep_data = _preprocess_data(data)
     # Perform prediction with model and preprocessed data.
     prediction = model.predict(prep_data)
+
     # Format as list for output standardisation.
-    return prediction[0].tolist()
+    result_list.append(prediction[0].tolist())
+    return result_list
